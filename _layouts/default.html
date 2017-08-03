@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ page.title }} | {{ site.title }}</title>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300">
+    <style>
+      body {
+      	max-width: 100em;
+      	margin: 1em auto;
+      	padding: 1em;
+        font-family: 'Roboto',sans-serif;
+        color: #757575;
+        font-weight: 300;
+        background: #FFF;
+      }
+      
+      ul.site {
+      	list-style: none;
+      	padding: 0;
+      	margin: 0;
+      }
+      
+      li.site {
+      	list-style: none;
+      	padding: 0.5em 0;
+      	margin: 0;
+      }
+      
+      a.site {
+      	text-decoration: none;
+      	color: #333;
+      	font-family: 'Roboto Slab', sans-serif;
+      }
+      
+      #brand {
+      	font-size: 3em;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 100;
+	line-height: 2em;
+      }
+      
+      #main {
+      	background: #FFF;
+      	max-width: 90em;
+      	margin: 0 auto;
+      }
+      
+      .label {
+      	color: #546e7a;
+      	text-transform: uppercase;
+      	font-weight: 900;
+      	font-size: .9em;
+      	margin-right: 1em;
+      }
+      
+      header.site{
+      	text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+  <div id="main">
+    <div class="top">
+          <a class="site" href="/" id="brand">{{ site.title }}</a>
+    </div>
+
+    <div id="content">
+        {{ content }}
+    </div>
+  </div>
+  </body>
+</html>
