@@ -9,6 +9,8 @@ title: ! 'SSRF And URL Related TIPS'
 ## Vulnerabilities
 
 * Weblogic SSRF
+* DokuWiki
+  * [DokuWiki fetch.php SSRF漏洞与tok安全验证绕过分析](http://paper.seebug.org/230/)
 * Atlassian Confluence (CVE-2016-6595)
   * [Confluence任意文件读取漏洞以及CVE-2016-6596 SSRF漏洞分析](http://xdxd.love/2016/06/03/confluence%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/)
 * Discuz SSRF
