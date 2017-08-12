@@ -4,7 +4,11 @@ author: AMBULONG@VULSPY
 title: ! 'SSRF And URL Related TIPS'
 ---
 
-#SSRF Related Tips
+# URL Related Tips
+
+nothing
+
+# SSRF Related Tips
 
 ## Vulnerabilities
 
@@ -50,11 +54,12 @@ title: ! 'SSRF And URL Related TIPS'
 
 ## Tools
 
-* (bcoles/ssrf_proxy)[https://github.com/bcoles/ssrf_proxy]
+* [bcoles/ssrf_proxy](https://github.com/bcoles/ssrf_proxy)
 
-## Posts
+## Posts & Reference
 * [利用 Gopher 协议拓展攻击面 - 长亭科技](https://blog.chaitin.cn/gopher-attack-surfaces/)
 * [A New Era of SSRF - Exploiting URL Parser in Trending Programming Languages! - Orange](https://www.blackhat.com/docs/us-17/thursday/us-17-Tsai-A-New-Era-Of-SSRF-Exploiting-URL-Parser-In-Trending-Programming-Languages.pdf)
 * [How I Chained 4 vulnerabilities on GitHub Enterprise, From SSRF Execution Chain to RCE! - Orange](http://blog.orange.tw/2017/07/how-i-chained-4-vulnerabilities-on.html)
 * [Port scanning with Server Side Request Forgery (SSRF) - IAN MUSCAT](https://www.acunetix.com/blog/articles/ssrf-vulnerability-used-to-scan-the-web-servers-network/)
 * [Build Your SSRF Exploit Framework - ring04h](https://github.com/ring04h/papers/blob/master/build_your_ssrf_exp_autowork--20160711.pdf)
+
