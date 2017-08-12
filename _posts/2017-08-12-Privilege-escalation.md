@@ -59,6 +59,8 @@ title: ! 'Local Privilege Escalation Tips'
 * Jenkins Unauthenticated Code Execution (CVE-2017-1000353)
 [SSD Advisory – CloudBees Jenkins Unauthenticated Code Execution](https://blogs.securiteam.com/index.php/archives/3171)
 
+* JBOSS
+
 * Struts 2 RCE
   * S2-001
   * S2-003 
