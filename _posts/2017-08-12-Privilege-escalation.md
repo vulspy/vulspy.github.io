@@ -9,12 +9,20 @@ title: ! 'Local Privilege Escalation Tips'
 * phpMyAdmin
 * ownCloud
 
+# PHP Disable Functions Bypass
+
+* Shellshock(CVE-2014-6271)
+* Imagemagick
+* Ghostscript
+* FFmpeg
+
 # Port
 
 * 1099 - Java RMI (Java Deserialization RCE)
 * 2375 - Docker Remote API
 * 6379 - Redis
-* 9000 - PHP-CGI RCE
+* 8161 - ActiveMQ (CVE-2016-3088)
+* 9000 - PHP-CGI/FastCGI RCE
 * 9001 - Supervisord (CVE-2017-11610)
 * 11211 - Memcached
 * 27017 - MongoDB
@@ -22,6 +30,13 @@ title: ! 'Local Privilege Escalation Tips'
 * 27019 - MongoDB
 
 # Service
+
+* Shellshock (CVE-2014-6271)
+  * CGI-based web server
+  * DHCP
+  * Git/Subversion
+  * Qmail
+  * OpenSSH
 
 * Cisco Prime Infrastructure (CVE-2016-1291)
 [CoalfireLabs/java_deserialization_exploits](https://github.com/CoalfireLabs/java_deserialization_exploits)
@@ -40,6 +55,9 @@ title: ! 'Local Privilege Escalation Tips'
 
 * Oracle WebLogic Server (CVE-2016-3510)
 [CoalfireLabs/java_deserialization_exploits](https://github.com/CoalfireLabs/java_deserialization_exploits)
+
+* Jenkins Unauthenticated Code Execution (CVE-2017-1000353)
+[SSD Advisory – CloudBees Jenkins Unauthenticated Code Execution](https://blogs.securiteam.com/index.php/archives/3171)
 
 * Struts 2 RCE
   * S2-001
@@ -65,6 +83,9 @@ title: ! 'Local Privilege Escalation Tips'
   * S2-046 (CVE-2017-5638)
   * S2-048 (CVE-2017-9791)
   * S2-devMode
+
+
+* Apache Tomcat
 
 # PATH
 
