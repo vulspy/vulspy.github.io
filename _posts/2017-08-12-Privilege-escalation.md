@@ -17,6 +17,9 @@ title: ! 'Local Privilege Escalation Tips'
 * 9000 - PHP-CGI RCE
 * 9001 - Supervisord (CVE-2017-11610)
 * 11211 - Memcached
+* 27017 - MongoDB
+* 27018 - MongoDB
+* 27019 - MongoDB
 
 # Service
 
