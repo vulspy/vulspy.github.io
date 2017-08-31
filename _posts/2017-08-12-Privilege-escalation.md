@@ -24,6 +24,7 @@ title: ! 'Local Privilege Escalation Tips'
 * 8161 - ActiveMQ (CVE-2016-3088)
 * 9000 - PHP-CGI/FastCGI RCE
 * 9001 - Supervisord (CVE-2017-11610)
+* 9200 - Elasticsearch
 * 11211 - Memcached
 * 27017 - MongoDB
 * 27018 - MongoDB
