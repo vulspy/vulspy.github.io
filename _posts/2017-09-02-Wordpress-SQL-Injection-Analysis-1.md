@@ -4,7 +4,8 @@ author: AMBULONG@VULSPY
 title: ! 'Wordpress SQL注入分析(1)'
 ---
 
-# Wordpress SQL注入分析(1)
+* [Wordpress SQL注入分析(1)](http://blog.vulspy.com/2017/09/02/Wordpress-SQL-Injection-Analysis-1.html)
+* [Wordpress SQL注入分析(2)](http://blog.vulspy.com/2017/09/03/Wordpress-SQL-Injection-Analysis-2.html)
 
 ## 第一章: sprintf/vsprintf 中的 argument numbering/swapping
 
