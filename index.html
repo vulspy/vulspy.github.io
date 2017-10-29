@@ -24,6 +24,16 @@
   <link rel="stylesheet" href="/css/style.css">
   
 
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-108901411-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-108901411-1');
+  </script>
+
 </head>
 
 <body>
@@ -109,7 +119,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://blog.vulspy.com/2017/09/05/Wordpress-POST-META-Check-Bypass/" data-id="cj7a2lf8q0003cnpvnngknyi0" class="article-share-link">Share</a>
+      <a data-url="http://blog.vulspy.com/2017/09/05/Wordpress-POST-META-Check-Bypass/" data-id="cj9cubsrf0007zxpvchtu18m6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/漏洞分析/">漏洞分析</a></li></ul>
@@ -148,7 +158,7 @@
 <li><a href="/2017/09/02/Wordpress-SQL-Injection-Analysis-1/">Wordpress SQL注入分析（一）</a></li>
 <li><a href="/2017/09/03/Wordpress-SQL-Injection-Analysis-2/">Wordpress SQL注入分析（二）</a></li>
 </ul>
-<p>在上一篇文章 <a href="/2017/09/05/Wordpress-SQL-Injection-Analysis-1/">Wordpress SQL注入分析（一）</a> 中，我们分析了Wordpress中的prepare函数在什么情况下会产生SQL注入漏洞。本篇文章将分析我们在Wordpress中发现的一处SQL注入。</p>
+<p>在上一篇文章 <a href="/2017/09/05/Wordpress-SQL-Injection-Analysis-1/">Wordpress SQL注入分析（一）</a> 中，我们分析了Wordpress中的prepare函数在什么情况下会产生SQL注入漏洞。本篇文章将分析Wordpress中的一处SQL注入。</p>
 <p>当前最新版：Wordpress 4.8.1</p>
 <h2 id="第三章：发现Wordpress中的SQL注入"><a href="#第三章：发现Wordpress中的SQL注入" class="headerlink" title="第三章：发现Wordpress中的SQL注入"></a>第三章：发现Wordpress中的SQL注入</h2><h3 id="3-1-SQL注入分析"><a href="#3-1-SQL注入分析" class="headerlink" title="3.1 SQL注入分析"></a>3.1 SQL注入分析</h3><p>在delete_metadata函数（文件：<a href="https://github.com/WordPress/WordPress/blob/bbb8d48086b7d10908f4fda673585ee122f2851d/wp-includes/meta.php#L307" target="_blank" rel="external">/wp-includes/meta.php</a>）中存在如下代码：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">delete_metadata</span><span class="params">($meta_type, $object_id, $meta_key, $meta_value = <span class="string">''</span>, $delete_all = false)</span> </span>&#123;</div><div class="line">	<span class="keyword">global</span> $wpdb;</div><div class="line">	<span class="keyword">if</span> ( ! $meta_type || ! $meta_key || ! is_numeric( $object_id ) &amp;&amp; ! $delete_all ) &#123;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">	&#125;</div><div class="line">	$object_id = absint( $object_id );</div><div class="line">	<span class="keyword">if</span> ( ! $object_id &amp;&amp; ! $delete_all ) &#123;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">	&#125;</div><div class="line">	$table = _get_meta_table( $meta_type );</div><div class="line">	<span class="keyword">if</span> ( ! $table ) &#123;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">	&#125;</div><div class="line">	$type_column = sanitize_key($meta_type . <span class="string">'_id'</span>);</div><div class="line">	$id_column = <span class="string">'user'</span> == $meta_type ? <span class="string">'umeta_id'</span> : <span class="string">'meta_id'</span>;</div><div class="line">	<span class="comment">// expected_slashed ($meta_key)</span></div><div class="line">	$meta_key = wp_unslash($meta_key);</div><div class="line">	$meta_value = wp_unslash($meta_value);</div><div class="line">	</div><div class="line">	$check = apply_filters( <span class="string">"delete_&#123;$meta_type&#125;_metadata"</span>, <span class="keyword">null</span>, $object_id, $meta_key, $meta_value, $delete_all );</div><div class="line">	<span class="keyword">if</span> ( <span class="keyword">null</span> !== $check )</div><div class="line">		<span class="keyword">return</span> (bool) $check;</div><div class="line">	$_meta_value = $meta_value;</div><div class="line">	$meta_value = maybe_serialize( $meta_value );</div><div class="line">	$query = $wpdb-&gt;prepare( <span class="string">"SELECT $id_column FROM $table WHERE meta_key = %s"</span>, $meta_key );</div><div class="line">	<span class="keyword">if</span> ( !$delete_all )</div><div class="line">		$query .= $wpdb-&gt;prepare(<span class="string">" AND $type_column = %d"</span>, $object_id );</div><div class="line">	<span class="keyword">if</span> ( <span class="string">''</span> !== $meta_value &amp;&amp; <span class="keyword">null</span> !== $meta_value &amp;&amp; <span class="keyword">false</span> !== $meta_value )</div><div class="line">		$query .= $wpdb-&gt;prepare(<span class="string">" AND meta_value = %s"</span>, $meta_value );</div><div class="line">	$meta_ids = $wpdb-&gt;get_col( $query );</div><div class="line">	<span class="keyword">if</span> ( !count( $meta_ids ) )</div><div class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">	<span class="keyword">if</span> ( $delete_all ) &#123;</div><div class="line">		$value_clause = <span class="string">''</span>;</div><div class="line">		<span class="keyword">if</span> ( <span class="string">''</span> !== $meta_value &amp;&amp; <span class="keyword">null</span> !== $meta_value &amp;&amp; <span class="keyword">false</span> !== $meta_value ) &#123;</div><div class="line">=&gt;			$value_clause = $wpdb-&gt;prepare( <span class="string">" AND meta_value = %s"</span>, $meta_value );</div><div class="line">		&#125;</div><div class="line">=&gt;		$object_ids = $wpdb-&gt;get_col( $wpdb-&gt;prepare( <span class="string">"SELECT $type_column FROM $table WHERE meta_key = %s $value_clause"</span>, $meta_key ) );</div><div class="line">	&#125;</div><div class="line">	...<span class="comment">//ignore</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -208,7 +218,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://blog.vulspy.com/2017/09/03/Wordpress-SQL-Injection-Analysis-2/" data-id="cj7a2lf8z0005cnpvld8lhvxj" class="article-share-link">Share</a>
+      <a data-url="http://blog.vulspy.com/2017/09/03/Wordpress-SQL-Injection-Analysis-2/" data-id="cj9cubsrd0006zxpvo0s0w9w6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/漏洞分析/">漏洞分析</a></li></ul>
@@ -311,7 +321,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://blog.vulspy.com/2017/09/02/Wordpress-SQL-Injection-Analysis-1/" data-id="cj7a2lf8y0004cnpv36qi4pjh" class="article-share-link">Share</a>
+      <a data-url="http://blog.vulspy.com/2017/09/02/Wordpress-SQL-Injection-Analysis-1/" data-id="cj9cubsrp000czxpvei3lci8z" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/漏洞分析/">漏洞分析</a></li></ul>
@@ -412,7 +422,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://blog.vulspy.com/2017/08/12/SSRF-And-URL-Related-TIPS/" data-id="cj7a2lf8l0001cnpvi912oyel" class="article-share-link">Share</a>
+      <a data-url="http://blog.vulspy.com/2017/08/12/SSRF-And-URL-Related-TIPS/" data-id="cj9cubsqu0001zxpvnk81d03r" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/渗透测试/">渗透测试</a></li></ul>
@@ -596,7 +606,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://blog.vulspy.com/2017/08/02/Local-Privilege-Escalation-Tips/" data-id="cj7a2lf8g0000cnpvff9bvg55" class="article-share-link">Share</a>
+      <a data-url="http://blog.vulspy.com/2017/08/02/Local-Privilege-Escalation-Tips/" data-id="cj9cubsqp0000zxpvwbm6bejs" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/渗透测试/">渗透测试</a></li></ul>
